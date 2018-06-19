@@ -2,6 +2,7 @@ import pygame
 from pygame.sprite import Sprite
 import random
 import bullet
+import time
 import math
 
 class Enemy(Sprite):
@@ -19,20 +20,26 @@ class Enemy(Sprite):
         self.typex = typex
         
         #存储敌机图片（向左向右）
-        self.images=[0,0]
-        if self.typex==0:
-            for i in range (2):
-                self.images[i]=pygame.image.load('../image/enemies/ordinplane'+str(i)+'.png')     
-        elif self.typex==1:
-            for i in range (2):
-                self.images[i]=pygame.image.load('../image/enemies/multiplane'+str(i)+'.png')    
-        elif self.typex==2:
-            for i in range (2):
-                self.images[i]=pygame.image.load('../image/enemies/missileplane'+str(i)+'.png')         
-        for i in range(2): 
-            self.images[i]=pygame.transform.scale(self.images[i],(80,45))       
-        
-        self.image=self.images[0]    
+        if typex==3:
+            self.image=pygame.image.load('../image/enemies/boss.png')
+        else:
+            self.images=[0,0]
+            if self.typex==0:
+                for i in range (2):
+                    self.images[i]=pygame.image.load('../image/enemies/ordinplane'+str(i)+'.png')     
+            elif self.typex==1:
+                for i in range (2):
+                    self.images[i]=pygame.image.load('../image/enemies/multiplane'+str(i)+'.png')    
+            elif self.typex==2:
+                for i in range (2):
+                    self.images[i]=pygame.image.load('../image/enemies/missileplane'+str(i)+'.png') 
+            elif self.typex==3:
+                self.images[0]=pygame.image.load('../image/enemies/boss.png')
+
+            for i in range(2): 
+                self.images[i]=pygame.transform.scale(self.images[i],(80,45))       
+            
+            self.image=self.images[0]    
 
         self.screen = screen
         self.rect = self.image.get_rect()
@@ -50,37 +57,62 @@ class Enemy(Sprite):
         self.speed = speed
         self.time_limit = time_limit  # hero可以驾驶的时限
         self.jackedTime = None  # 被劫机的时间
-
-        self.fire_T=self.settings.fire_T[self.bullet_type]
+        if typex!=3:
+            self.fire_T=self.settings.fire_T[self.bullet_type]
         
         self.moving_udlr = [False, False, False, False]
         self.inity=self.y #self.y的初始值
         self.face_right=False #向左向右
 
-    def update(self, bullets, target_hero, t_interval):
+    def update(self, bullets, target_hero, t_interval,sound):
         """移动或发射子弹"""
         #移动, 修改x, y后写入rect中
-        t_change = t_interval * self.speed
-        self.t+=t_change
-        #移动
-        if self.typex==0:    
-            self.track(200,200)  
-        elif self.typex==1:
-            self.track(300,100)
-        elif self.typex==2:
-<<<<<<< HEAD
-            self.track(150,200)
-=======
-            self.track(100,200)
->>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
+        if self.bullet_type!=3:
+            t_change = t_interval * self.speed
+            self.t+=t_change
+            #移动
+            if self.typex==0:    
+                self.track(200,200)  
+            elif self.typex==1:
+                self.track(300,100)
+            elif self.typex==2:
+                self.track(150,200)
 
-        #随机发射子弹，1/fire_T概率发射
-        randnum = random.randint(1, self.fire_T)
-        if randnum == 3:
-            self.fire_bullet(bullets, self.screen, target_hero)
-        
+            #随机发射子弹，1/fire_T概率发射
+            randnum = random.randint(1, self.fire_T)
+            if randnum == 3:
+                self.fire_bullet(bullets, self.screen, target_hero,sound)
 
-    def fire_bullet(self, bullets, screen, target_hero):
+        else:
+            if not self.appeared:
+                if time.clock()>60:
+                    self.appeared=True
+            else:
+                t_change = t_interval * self.speed
+                self._t+=t_change
+                if self._t>1000:
+                    self._t=0
+                self.track(200,150,t_change)
+                if self._t>157:
+                    if self.shooting==-1:
+                        randnum=random.randint(1,120)
+                        if randnum==10 or randnum==11:
+                            self.shooting=0
+                            self.clock0=pygame.time.Clock()
+                            #self.fire_bullet(bullets,0)
+                        elif randnum==30 or randnum==31 or randnum==32:
+                            self.shooting=1
+                            self.clock0=pygame.time.Clock()
+                            #self.fire_bullet(bullets,1)
+                        elif randnum==50:
+                            self.shooting=2
+                            self.clock0=pygame.time.Clock()
+                            #self.fire_bullet(bullets,2,target_hero)
+            
+                self.fire_bullet(bullets, self.screen , self.shooting, target_hero)
+            
+
+    def fire_bullet(self, bullets, screen, target_hero,sound):
         """
         发射子弹，根据传入的子弹类型发射对应子弹
         """
@@ -94,9 +126,14 @@ class Enemy(Sprite):
         elif self.typex == 2:
             bulletx = bullet.Bullet2(self.settings, screen, self, target_hero, False)
             bullets[5].add(bulletx)
+            sound.do_play['missile']=True
 
-    def track(self,Rx,Ry):
+    def track(self,Rx,Ry,t_change=0):
         '''移动在轨迹上，Rx为x轴方向的半径，Ry为y方向半径'''
+        if self.bullet_type==3:
+            if self._t<300:
+                self.t+=t_change
+                #print(self.t,'\n','\n')
         ctx=1250-self.t_turn+self.init_t-Rx
         tmpx=self.x
         if self.t<self.t_turn:
@@ -107,12 +144,13 @@ class Enemy(Sprite):
         self.rect.centerx, self.rect.centery=self.x, self.y
 
         #改变image
-        if tmpx<self.x and not self.face_right:
-            self.face_right=True
-            self.image=self.images[1]
-        elif tmpx>self.x and self.face_right:
-            self.face_right=False
-            self.image=self.images[0]
+        if self.bullet_type!=3:
+            if tmpx<self.x and not self.face_right:
+                self.face_right=True
+                self.image=self.images[1]
+            elif tmpx>self.x and self.face_right:
+                self.face_right=False
+                self.image=self.images[0]
 
 
 class Ordin_plane(Enemy):
@@ -122,13 +160,8 @@ class Ordin_plane(Enemy):
         self.speed = settings.ordinPlaneSpeed
         self.time_limit = settings.ordinPlaneTimeLimit  # hero可以驾驶的时限
         self.bullet_type = 0
-<<<<<<< HEAD
         self.t_turn=900
         self.t = float(random.randint(0,self.t_turn-100)) #控制其位置的自变量：self.y=a(t),self.x=b(t)
-=======
-        self.t_turn=950
-        self.t = float(random.randint(0,self.t_turn)) #控制其位置的自变量：self.y=a(t),self.x=b(t)
->>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
         self.init_t=self.t
         Enemy.__init__(self, settings, screen, self.life, self.speed, self.time_limit, self.bullet_type)
 
@@ -141,11 +174,7 @@ class Multi_plane(Enemy):
         self.time_limit = settings.multiPlaneTimeLimit  # hero可以驾驶的时限
         self.bullet_type = 1
         self.t_turn=750
-<<<<<<< HEAD
         self.t = float(random.randint(0,self.t_turn-100)) #控制其位置的自变量：self.y=a(t),self.x=b(t)
-=======
-        self.t = float(random.randint(0,self.t_turn)) #控制其位置的自变量：self.y=a(t),self.x=b(t)
->>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
         self.init_t=self.t
         Enemy.__init__(self, settings, screen, self.life, self.speed, self.time_limit, self.bullet_type)
 
@@ -157,12 +186,82 @@ class Missile_plane(Enemy):
         self.speed = settings.missilePlaneSpeed
         self.time_limit = settings.missilePlaneTimeLimit  # hero可以驾驶的时限
         self.bullet_type = 2
-<<<<<<< HEAD
         self.t_turn=900
         self.t = float(random.randint(0,self.t_turn-200)) #控制其位置的自变量：self.y=a(t),self.x=b(t)
-=======
-        self.t_turn=1050
-        self.t = float(random.randint(0,self.t_turn)) #控制其位置的自变量：self.y=a(t),self.x=b(t)
->>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
         self.init_t=self.t
         Enemy.__init__(self, settings, screen, self.life, self.speed, self.time_limit, self.bullet_type)  
+
+class Boss(Enemy):
+    def __init__(self,settings,screen):
+        self.appeared=False
+        self.life = settings.bossLife  # 生命值
+        self.speed = settings.bossSpeed
+        self.bullet_type = 3
+        
+        Enemy.__init__(self, settings, screen, self.life, self.speed, 0, self.bullet_type) 
+        #self.rect_draw=pygame.Rect(self.rect)
+        #self.rect.width=89
+        #self.rect.centerx+=57
+        self.rect.centery=0.5 * settings.screen_height
+        self.y=float(self.rect.centery)
+        self.inity=self.y
+
+        self.t_turn=500
+        self._t=0 #控制其位置的自变量：self.y=a(t),self.x=b(t)
+        self.t = 0 
+        self.init_t=self._t
+
+        self.time0=0.0
+        self.clock0=0
+        self.shoot_dir0=0
+        self.shooting=-1
+
+
+    def fire_bullet(self,bullets,screen,typex,target_hero=0):
+        if typex==0:
+            tmp=self.shoot_dir0
+            self.shoot_dir0=(self.time0//200)*(math.pi*3/4)
+            if self.shoot_dir0>tmp:
+                if self.shoot_dir0>4*math.pi:
+                    self.shooting=-1
+                    self.time0=0.0
+                    self.shoot_dir0=0.0
+                    return    
+                for i in range(10):
+                    bulletx=bullet.Bullet0(self.settings, screen, self, self.shoot_dir0+i*(math.pi/20),False,1)
+                    bullets[3].add(bulletx)
+            self.time0+=self.clock0.tick()
+
+        elif typex==1:
+            tmp=self.shoot_dir0
+            self.shoot_dir0=50*math.sin(0.2*self.time0//50)
+            if self.shoot_dir0!=tmp:
+                if self.time0>2400:
+                    self.shooting=-1
+                    self.time0=0.0
+                    self.shoot_dir0=0.0
+                    return    
+                for i in range(4):
+                    bulletx=bullet.Bullet1(self.settings, screen, self, i*(math.pi/2),False,self.shoot_dir0,True)
+                    bullets[4].add(bulletx)
+            self.time0+=self.clock0.tick()
+
+        elif typex==2:
+            tmp=self.shoot_dir0
+            self.shoot_dir0=self.time0//400    
+            if self.shoot_dir0!=tmp:
+                if self.shoot_dir0>=5:
+                    self.shooting=-1
+                    self.time0=0.0
+                    self.shoot_dir0=0.0
+                    return
+                bulletx=bullet.Bullet2(self.settings, screen, self, target_hero, False)
+                bullets[5].add(bulletx)
+            self.time0+=self.clock0.tick()
+            
+            
+
+
+
+
+

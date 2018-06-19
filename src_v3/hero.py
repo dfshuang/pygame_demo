@@ -34,6 +34,9 @@ class Hero(Sprite):
         # 射击方向（水平向右为0度，按d or c可以改变shoot_dir）
         self.shoot_dir = 0
 
+        #射击杀伤力
+        self.lethality=1
+
         # 开导弹机时要轰炸的目标
         self.missile_target = None
         
@@ -103,7 +106,7 @@ class Hero(Sprite):
         else:
             self.screen.blit(self.image, self.rect)
 
-    def update(self, bullets,bursts,t_interval, stats, sb, sett,screen):
+    def update(self, bullets,bursts,t_interval, stats, sb, sett,screen,sound):
         """
         :param t_interval: 根据屏幕刷新时间改变移动距离
         :param stats: 当前统计信息
@@ -135,7 +138,7 @@ class Hero(Sprite):
                         self.rect=self.image.get_rect()
                         self.rect.centerx, self.rect.centery=tmprect.centerx, tmprect.centery
                     
-            elif self.moving_left:
+            if self.moving_left:
                 if self.x>0:
                     self.x -= move_distance
                     self.rect.centerx = self.x
@@ -150,11 +153,7 @@ class Hero(Sprite):
                             index=int(11-self.shoot_dir//(math.pi/4))
                         else:
                             index=int(3-self.shoot_dir//(math.pi/4))
-<<<<<<< HEAD
                         #报错
-=======
-                        #print(index,self.imgnum)
->>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
                         self.image=self.images['run'][index][self.imgnum]
                         tmprect=self.rect                    
                         self.rect=self.image.get_rect()
@@ -194,11 +193,7 @@ class Hero(Sprite):
             planeTimeLeft = self.plane.jackedTime + self.plane.time_limit - time.clock()
             if planeTimeLeft <= 0:
                 # 超时
-<<<<<<< HEAD
                 gf.start_burst(True,self,bursts,sound)
-=======
-                gf.start_burst(True,self,bursts)
->>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
                 self.plane = None
                 self.life -= 1
                 self.face_right = True
@@ -230,43 +225,49 @@ class Hero(Sprite):
                 self.rect.centerx, self.rect.centery = self.x, self.y
 
         #刷新主角生命值和飞机生命值
-        sb.prep_herolife(self.life)
+        stats.heroLife = self.life
         if self.plane:
-            sb.prep_planeTimeLimit(planeTimeLeft)
-            sb.prep_planeLife(self.plane.life)
+            stats.planeTimeLimit = planeTimeLeft
+            stats.planeLife = self.plane.life
         else:
-            sb.prep_planeTimeLimit(0)
-            sb.prep_planeLife(0)
+            stats.planeTimeLimit = 0
+            stats.planeLife = 0
 
-        # 判断是否生命值以为0，每次游戏可以复活三次，三次机会用完了就得重新开始
+        # 判断是否生命值以为0，每次游戏可以复活2次，三次机会用完了就得重新开始
         if self.life <= 0:
+            sound.do_play['die'] = True
             stats.hero_left -= 1
-            sb.prep_planes()
-            if stats.hero_left < 0:
+            if stats.hero_left <= 0:
                 stats.game_active = False
+                stats.isStartMenu = True
+                pg.mouse.set_visible(True)
+                #角色死后，记录分数信息
+                with open("record.txt", 'a+') as fw:
+                    fw.write(str(stats.high_score) + '\n')
+
             self.life = sett.hero_life
     
-    def super_skill(self,sett, screen, bullets):
-        '''技能'''
-        tmp=self.shoot_dir0
-        self.shoot_dir0=(self.skill_time//100)*(math.pi/25)
+    def super_skill(self, sett, screen, bullets):
+        """技能"""
+        tmp = self.shoot_dir0
+        self.shoot_dir0 = (self.skill_time//100)*(math.pi/25)
         if self.shoot_dir0>tmp:
-            if self.shoot_dir0>2*math.pi:
-                self.skilling=False
-                self.skill_time=0.0
-                self.shoot_dir0=0.0
+            if self.shoot_dir0 > 2*math.pi:
+                self.skilling = False
+                self.skill_time = 0.0
+                self.shoot_dir0 = 0.0
                 return    
             for i in range(6):
-                bullet=Bullet0(sett, screen, self, self.shoot_dir0+i*(math.pi/3), True,True)
+                bullet = Bullet0(sett, screen, self, self.shoot_dir0+i*(math.pi/3), True, 3)
                 bullets[0].add(bullet)
-        self.skill_time+=self.skill_clock.tick()
+        self.skill_time += self.skill_clock.tick()
 
     def skill_cooling(self):
-        '''技能冷却'''
-        self.skill_time+=self.skill_clock.tick()
-        if self.skill_time>10000:
-            self.cool_finished=True
-            self.skill_time=0.0
+        """技能冷却"""
+        self.skill_time += self.skill_clock.tick()
+        if self.skill_time > 40000:
+            self.cool_finished = True
+            self.skill_time = 0.0
 
 
 

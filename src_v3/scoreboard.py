@@ -12,7 +12,7 @@ class Scoreboard():
         self.stats = stats
 
         #显示得分信息时使用的字体
-        self.text_color = (255,255,255)
+        self.text_color = (255, 255, 255)
         self.font = pygame.font.SysFont(None, 30)
 
         #准备初始得分图像
@@ -20,17 +20,16 @@ class Scoreboard():
         self.prep_high_score()
         self.prep_level()
         self.prep_planes()
-        self.prep_herolife(g_settings.hero_life)
-        self.prep_planeLife(0)
-        self.prep_planeTimeLimit(0)    
+        self.prep_herolife()
+        self.prep_planeLife()
+        self.prep_planeTimeLimit()
         self.prep_helpMessage()
 
     def prep_high_score(self):
         """将最高得分转化为渲染的图像"""
         high_score = int(round(self.stats.high_score, -1))
         high_score_str = 'highest score: ' + '{:,}'.format(high_score)
-        self.high_score_image = self.font.render(high_score_str, True,
-                                            self.text_color, self.g_settings.bg_color)
+        self.high_score_image = self.font.render(high_score_str, True, self.text_color)
 
         #将最高得分放在屏幕顶部中间
         self.high_score_rect = self.high_score_image.get_rect()
@@ -41,8 +40,7 @@ class Scoreboard():
         """将得分转换为一幅渲染的图像"""
         rounded_score = int(round(self.stats.score, -1))
         score_str = 'score: ' + '{:,}'.format(rounded_score)
-        self.score_image = self.font.render(score_str, True, self.text_color,
-                                            self.g_settings.bg_color)
+        self.score_image = self.font.render(score_str, True, self.text_color)
         #将得分放在屏幕右上角
         self.score_rect = self.score_image.get_rect()
         self.score_rect.right = self.screen_rect.right - 20
@@ -50,7 +48,7 @@ class Scoreboard():
 
     def prep_level(self):
         self.level_image = self.font.render('level: ' + str(self.stats.level), True,
-                                            self.text_color, self.g_settings.bg_color)
+                                            self.text_color)
         self.level_rect = self.level_image.get_rect()
         self.level_rect.right = self.score_rect.right
         self.level_rect.top = self.score_rect.bottom + 10
@@ -64,30 +62,27 @@ class Scoreboard():
             plane.rect.y = 10
             self.planes.add(plane)
 
-    def prep_herolife(self, hero_life):
+    def prep_herolife(self):
         """将主角生命值转换为一幅渲染的图像"""
         plane = Hero(self.screen, self.g_settings)  #为获取plane图像高度
-        hero_life_str = 'life: ' + '{:,}'.format(hero_life)
-        self.hero_life_image = self.font.render(hero_life_str, True, self.text_color,
-                                            self.g_settings.bg_color)
+        hero_life_str = 'life: ' + '{:,}'.format(self.stats.heroLife)
+        self.hero_life_image = self.font.render(hero_life_str, True, self.text_color)
         # 将生命值放在屏幕左上角
         self.hero_life_rect = self.hero_life_image.get_rect()
         self.hero_life_rect.left = 20
         self.hero_life_rect.top = plane.rect.height + 10
 
-    def prep_planeLife(self, planeLife):
-        planeLife_str = 'planeLife: ' + '{:,}'.format(planeLife)
-        self.planeLife_image = self.font.render(planeLife_str, True, self.text_color,
-                                                     self.g_settings.bg_color)
+    def prep_planeLife(self):
+        planeLife_str = 'planeLife: ' + '{:,}'.format(self.stats.planeLife)
+        self.planeLife_image = self.font.render(planeLife_str, True, self.text_color)
         # 将生命值放在屏幕左上角
         self.planeLife_rect = self.planeLife_image.get_rect()
         self.planeLife_rect.left = 20
         self.planeLife_rect.top = self.hero_life_rect.bottom + 7
 
-    def prep_planeTimeLimit(self, planeTimeLimit):
-        planeTimeLimit_str = 'planeTimeLeft: ' + '{:,}'.format(int(planeTimeLimit))
-        self.planeTimeLimit_image = self.font.render(planeTimeLimit_str, True, self.text_color,
-                                                self.g_settings.bg_color)
+    def prep_planeTimeLimit(self):
+        planeTimeLimit_str = 'planeTimeLeft: ' + '{:,}'.format(int(self.stats.planeTimeLimit))
+        self.planeTimeLimit_image = self.font.render(planeTimeLimit_str, True, self.text_color)
         # 将生命值放在屏幕左上角
         self.planeTimeLimit_rect = self.planeTimeLimit_image.get_rect()
         self.planeTimeLimit_rect.left = 20
@@ -95,16 +90,56 @@ class Scoreboard():
 
     def prep_helpMessage(self):
         fonttemp = pygame.font.SysFont(None, 30)
-        helpMessage_str = 'q: exit, d,c: change shoot dir, space: fire bullet, g,b: leave plane'
-        self.helpMessage_image = fonttemp.render(helpMessage_str, True, self.text_color,
-                                                     self.g_settings.bg_color)
+        helpMessage_str = 'q: exit, ad jk io u'
+        self.helpMessage_image = fonttemp.render(helpMessage_str, True, self.text_color)
+
         # 将生命值放在屏幕左上角
         self.helpMessage_rect = self.helpMessage_image.get_rect()
         self.helpMessage_rect.centerx = self.screen_rect.centerx
         self.helpMessage_rect.top = 350
 
-    def show_score(self):
+    def prep_record(self):
+        """从文件中读取分数记录，显示前3"""
+        with open("record.txt", "r") as fr:
+            record = []
+            for line in fr.readlines():
+                record.append(int(round(float(line))))
+
+            score_str = 'rank     score'
+            score_image = self.font.render(score_str, True, self.text_color)
+            # 将得分放在屏幕中间
+            score_rect = score_image.get_rect()
+            score_rect.left = 400
+            score_rect.top = 150
+            self.screen.blit(score_image, score_rect)
+
+            record.sort(reverse=True)
+            record_cnt = 1
+            for r in record:
+                score_str = '{:>4}'.format(record_cnt) + '         ' + '{:,}'.format(r)
+                score_image = self.font.render(score_str, True, self.text_color)
+                # 将得分放在屏幕中间
+                score_rect = score_image.get_rect()
+                score_rect.left = 400
+                score_rect.top = 150 + record_cnt * 30
+                self.screen.blit(score_image, score_rect)
+                record_cnt += 1
+                if record_cnt > 10:
+                    break
+
+    def show_message(self):
         """在屏幕上显示得分"""
+        #更新屏幕消息
+        self.prep_score()
+        self.prep_high_score()
+        self.prep_level()
+        self.prep_planes()
+        self.prep_herolife()
+        self.prep_planeLife()
+        self.prep_planeTimeLimit()
+        self.prep_helpMessage()
+
+
         #绘制各种实时信息
         self.screen.blit(self.score_image, self.score_rect)
         self.screen.blit(self.high_score_image, self.high_score_rect)
@@ -112,8 +147,10 @@ class Scoreboard():
         self.screen.blit(self.hero_life_image, self.hero_life_rect)
         self.screen.blit(self.planeTimeLimit_image, self.planeTimeLimit_rect)
         self.screen.blit(self.planeLife_image, self.planeLife_rect)
-        if self.stats.game_pause:
+        if self.stats.game_pause or self.stats.isHelp:
             self.screen.blit(self.helpMessage_image, self.helpMessage_rect)
+        if self.stats.isRecord:
+            self.prep_record()
         #绘制飞机多少条命
         self.planes.draw(self.screen)
 

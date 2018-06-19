@@ -50,8 +50,9 @@ class Bullet(Sprite):
         self.rect = self.image.get_rect()
 
         # 根据shooter（同样有属性rect）位置初始化子弹位置
+        
         self.rect.centerx = shooter.rect.centerx
-        self.rect.centery = shooter.rect.centery
+        self.rect.centery = shooter.rect.centery - (7 if _type==0 else 0)
 
         # 用self.x, self.y存储用小数表示的子弹位置
 
@@ -63,11 +64,11 @@ class Bullet(Sprite):
 class Bullet0(Bullet):
     """普通子弹,直线飞行"""
 
-    def __init__(self, sett, screen, shooter, dir, byhero, is_skill=False):
+    def __init__(self, sett, screen, shooter, dir, byhero, letha=1):
 
         """在发射点所处的位置创建一个子弹对象"""
         
-        lethality=sett.lethality[3] if is_skill else sett.lethality[0]
+        lethality=letha
 
         super().__init__(sett, screen, shooter, sett.bullet0_speed, lethality, byhero, 0)
 
@@ -92,7 +93,7 @@ class Bullet0(Bullet):
 class Bullet1(Bullet):
     """多核弹，直线飞到一定距离后分裂"""
 
-    def __init__(self, sett, screen, shooter, dir, byhero):
+    def __init__(self, sett, screen, shooter, dir, byhero, offset=0, byboss=False):
 
         """在发射点所处的位置创建一个子弹对象"""
 
@@ -106,6 +107,16 @@ class Bullet1(Bullet):
             lr=0
         super().__init__(sett, screen, shooter, sett.bullet1_speed, sett.lethality[1], byhero, 1,lr)
 
+        self.byboss=byboss
+        if byboss:
+            self.image=pg.transform.scale(self.image,(25,20))
+            if dir==0 or dir==math.pi:
+                self.rect.centery+=offset
+                self.y=float(self.rect.centery)
+            else:
+                self.rect.centerx+=offset
+                self.x=float(self.rect.centerx)
+        
         self.sett = sett
 
         self.dir = dir
@@ -133,40 +144,28 @@ class Bullet1(Bullet):
         self.rect.centery = self.y
 
         self.dist_pass += move_distance
-
-        #400: 走过的距离
-        if (self.dist_pass >= 250):
-            # 五个方向
-            new_bullet0 = Bullet0(self.sett, self.screen, self, -self.sett.degree_disper*2 + self.dir, self.byhero)
-            new_bullet1 = Bullet0(self.sett, self.screen, self, -self.sett.degree_disper + self.dir, self.byhero)
-            new_bullet2 = Bullet0(self.sett, self.screen, self, self.dir, self.byhero)
-            new_bullet3 = Bullet0(self.sett, self.screen, self, self.sett.degree_disper + self.dir, self.byhero)
-            new_bullet4 = Bullet0(self.sett, self.screen, self, self.sett.degree_disper*2 + self.dir, self.byhero)
-     
-            if self.byhero == True:
-                bullets[0].add(new_bullet0)
-                bullets[0].add(new_bullet1)
-                bullets[0].add(new_bullet2)
-                bullets[0].add(new_bullet3)
-                bullets[0].add(new_bullet4)
-
-                # bullets[1]删除这个子弹
-                bullets[1].remove(self)
-            else:
-                bullets[3].add(new_bullet0)
-                bullets[3].add(new_bullet1)
-                bullets[3].add(new_bullet2)
-                bullets[3].add(new_bullet3)
-                bullets[3].add(new_bullet4)
-
-                # bullets[4]删除这个子弹
-                bullets[4].remove(self)
+        if not self.byboss:
+            #250: 走过的距离
+            if self.dist_pass >= 250:
+                # 五个方向
+                for i in range(-2,3):
+                    new_bullet0 = Bullet0(self.sett, self.screen, self, i*self.sett.degree_disper + self.dir, self.byhero)
+                    bullets[0 if self.byhero else 3].add(new_bullet0)
+                # 删除这个子弹
+                bullets[1 if self.byhero else 4].remove(self)
+        else:
+            if self.dist_pass>=500:
+                for i in range(-1,2):
+                    new_bullet0 = Bullet0(self.sett, self.screen, self, i*math.pi/3 + self.dir, self.byhero)
+                    bullets[0 if self.byhero else 3].add(new_bullet0)
+                # 删除这个子弹
+                bullets[1 if self.byhero else 4].remove(self)
 
 
 class Bullet2(Bullet):
     """导弹，能一直追踪hero，能被子弹击落"""
 
-    def __init__(self, sett, screen, shooter, target, byhero,enemies=[], bullets=[]):
+    def __init__(self, sett, screen, shooter, target, byhero,enemies=[], bullets=[],boss=0):
 
         super().__init__(sett, screen, shooter, sett.bullet2_speed, sett.lethality[2], byhero, 2)
 
@@ -176,19 +175,19 @@ class Bullet2(Bullet):
 
         if byhero==True:
             radar=Radar(self.rect)
-            self.target=radar.detect(enemies,bullets)
+            self.target=radar.detect(enemies,boss,bullets)
         else:
             self.target=target
 
 
-    def update(self, bullets, t_interval, enemies=[]):
+    def update(self, bullets, t_interval, enemies=[],boss=0):
         """每次更新位置都朝着target_pos方向即可"""
         
         if self.byhero:
             #判断目标是否还存活，如果不存活，再选一个目标
-            if self.target not in enemies and self.target not in bullets[5]:
+            if (self.target not in enemies and self.target not in bullets[5]) or (str(type(self.target))=="<class 'enemy.Boss'>" and not self.target.appeared):
                 radar=Radar(self.rect)
-                self.target=radar.detect(enemies,bullets)
+                self.target=radar.detect(enemies,boss,bullets)
 
         # 目标位置        
         target_pos = (self.target.rect.centerx, self.target.rect.centery)
@@ -233,13 +232,20 @@ class Radar(Sprite):
         self.rect=pg.Rect(init_rect)
         self.centerx, self.centery=self.rect.centerx, self.rect.centery
 
-    def detect(self,enemies,bullets):
+    def detect(self,enemies,boss,bullets):
         for i in range(6):
             #扩大探测范围
             self.rect.width+=200
             self.rect.height+=200
             self.rect.centerx, self.rect.centery=self.centerx, self.centery
-     
+
+            if boss.appeared:
+                boss_t=[boss]
+                boss_detected=pg.sprite.spritecollide(self,boss_t,False)
+                if boss_detected:
+                    self.rect.size=(0,0)
+                    return boss_detected[0]
+
             #检测探测范围内是否有敌机
             enemies_detected=pg.sprite.spritecollide(self, enemies,False)
             if enemies_detected:

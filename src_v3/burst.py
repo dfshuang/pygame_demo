@@ -3,10 +3,7 @@ import pygame
 class Burst(pygame.sprite.Sprite):
     def __init__(self,is_enemy, pos):
         super().__init__()
-<<<<<<< HEAD
         
-=======
->>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
         self.images=[0,0]
         for i in range(2):
             self.images[i]=pygame.image.load('../image/enemies/burst'+str(i)+'.png')
