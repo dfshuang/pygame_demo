@@ -7,7 +7,11 @@ import game_function as gf
 from hero import Hero
 from enemy import *
 from bullet import *
+<<<<<<< HEAD
 from background import *
+=======
+from background import Background
+>>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
 from button import Button
 from game_stats import GameStats
 from scoreboard import Scoreboard
@@ -15,11 +19,14 @@ from scoreboard import Scoreboard
  
 def run_game():
     pg.init()
+<<<<<<< HEAD
 
     #bgm
     pg.mixer.init()
     pg.mixer.music.load('../sound/bgm.mp3')
     
+=======
+>>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
     sett = Settings()
     screen = pg.display.set_mode((sett.screen_width, sett.screen_height))
     pg.display.set_caption("Super Hijacker")
@@ -30,8 +37,12 @@ def run_game():
     sb = Scoreboard(sett, screen, stats)
 
     #背景
+<<<<<<< HEAD
     bg = Background(sett)
     sound = Sound()
+=======
+    bg=Background(sett)
+>>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
 
     # 创建hero
     hero = Hero(screen, sett)
@@ -56,6 +67,7 @@ def run_game():
     while True:
         t_interval = clock.tick()/1000  #距离上一帧的时间间隔(s)
         gf.night_or_day(t_interval, stats,sett)
+<<<<<<< HEAD
         gf.handle_events(sett, screen, hero, enemies, bullets,bursts, stats, sb,sound)
         if stats.game_active == True and not stats.game_pause:
             bg.update()
@@ -64,6 +76,17 @@ def run_game():
             gf.update_enemies(enemies, hero, bullets,bursts, stats, t_interval, sb,sound)
             gf.update_bursts(bursts)
         gf.update_screen(sett, screen, bg, hero, enemies, bullets,bursts, play_button, pause_button, stats, sb, sound)
+=======
+        gf.handle_events(sett, screen, hero, enemies, bullets,bursts, stats, sb)
+        if stats.game_active == True and not stats.game_pause:
+            bg.update()
+            hero.update(bullets,bursts, t_interval, stats, sb, sett,screen)
+            gf.update_bullets(sett, bullets, hero, enemies, bursts, screen, stats, t_interval, sb)
+            gf.update_enemies(enemies, hero, bullets,bursts, stats, t_interval, sb)
+            gf.update_bursts(bursts)
+
+        gf.update_screen(sett, screen, bg, hero, enemies, bullets,bursts, play_button, pause_button, stats, sb)
+>>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
 
         
 

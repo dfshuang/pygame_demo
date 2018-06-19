@@ -7,7 +7,11 @@ from burst import *
 import random
 import math
 
+<<<<<<< HEAD
 def handle_events(sett, screen, hero, enemies, bullets,bursts, stats, sb,sound):
+=======
+def handle_events(sett, screen, hero, enemies, bullets,bursts, stats, sb):
+>>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
     """
 	处理键盘和鼠标事件
 	"""
@@ -17,7 +21,11 @@ def handle_events(sett, screen, hero, enemies, bullets,bursts, stats, sb,sound):
             sys.exit()
 
         elif event.type == pg.KEYDOWN:
+<<<<<<< HEAD
             handle_keydown(sett, screen, event, enemies, hero, bullets,bursts, stats, sb,sound)
+=======
+            handle_keydown(sett, screen, event, enemies, hero, bullets,bursts, stats, sb)
+>>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
 
         elif event.type == pg.KEYUP:
             handle_keyup(event, hero)
@@ -26,7 +34,11 @@ def handle_events(sett, screen, hero, enemies, bullets,bursts, stats, sb,sound):
             mouse_x, mouse_y = pg.mouse.get_pos()
             handle_mouse(mouse_x, mouse_y, hero, enemies)
 
+<<<<<<< HEAD
 def handle_keydown(sett, screen, event, enemies, hero, bullets,bursts, stats, sb,sound):
+=======
+def handle_keydown(sett, screen, event, enemies, hero, bullets,bursts, stats, sb):
+>>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
     """
     q: 退出
     p: 暂停
@@ -43,12 +55,16 @@ def handle_keydown(sett, screen, event, enemies, hero, bullets,bursts, stats, sb
 
     # 暂停游戏
     elif event.key == pg.K_p:
+<<<<<<< HEAD
         if stats.game_pause==False:
             stats.game_pause = True
             pg.mixer.music.pause()
         else:
             stats.game_pause = False
             pg.mixer.music.unpause()
+=======
+        stats.game_pause = not stats.game_pause
+>>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
 
     # 开始游戏
     elif event.key == pg.K_RETURN:
@@ -141,7 +157,10 @@ def handle_keydown(sett, screen, event, enemies, hero, bullets,bursts, stats, sb
         elif event.key == pg.K_k:
             bullet0 = Bullet1(sett, screen, hero, hero.shoot_dir, True)
             bullets[1].add(bullet0)
+<<<<<<< HEAD
             sound.do_play['fire'] = True
+=======
+>>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
 
         #技能
         elif event.key == pg.K_u:
@@ -202,6 +221,7 @@ def handle_keydown(sett, screen, event, enemies, hero, bullets,bursts, stats, sb
                     tmp.rect.centerx, tmp.rect.centery=hero.plane.rect.centerx-15*i, hero.plane.rect.centery
                     bullet0 = Bullet0(sett, screen, tmp, hero.shoot_dir, True)
                     bullets[0].add(bullet0)
+<<<<<<< HEAD
                 sound.do_play['fire']=True   
             elif str(type(hero.plane)) == "<class 'enemy.Multi_plane'>":
                 bullet1 = Bullet1(sett, screen, hero.plane, hero.shoot_dir, True)
@@ -215,6 +235,19 @@ def handle_keydown(sett, screen, event, enemies, hero, bullets,bursts, stats, sb
         elif event.key == pg.K_j:
             # 以跳跃方式离开敌机
             start_burst(True,hero,bursts,sound)
+=======
+                
+            elif str(type(hero.plane)) == "<class 'enemy.Multi_plane'>":
+                bullet1 = Bullet1(sett, screen, hero.plane, hero.shoot_dir, True)
+                bullets[1].add(bullet1)
+            elif str(type(hero.plane)) == "<class 'enemy.Missile_plane'>":
+                bullet2 = Bullet2(sett, screen, hero.plane, 0, True, enemies, bullets)
+                bullets[2].add(bullet2)
+
+        elif event.key == pg.K_j:
+            # 以跳跃方式离开敌机
+            start_burst(True,hero,bursts)
+>>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
             hero.plane = None
             hero.face_right = True
             hero.shoot_dir = 0
@@ -222,7 +255,11 @@ def handle_keydown(sett, screen, event, enemies, hero, bullets,bursts, stats, sb
             hero.jumpfallspeed = hero.jump_init_speed
         elif event.key == pg.K_n:
             # 以下落方式离开敌机
+<<<<<<< HEAD
             start_burst(True,hero,bursts,sound)
+=======
+            start_burst(True,hero,bursts)
+>>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
             hero.plane = None
             hero.face_right = True
             hero.shoot_dir = 0
@@ -234,7 +271,10 @@ def handle_keydown(sett, screen, event, enemies, hero, bullets,bursts, stats, sb
                 hero.skilling=True
                 hero.skill_clock=pg.time.Clock()
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
 def handle_keyup(event, hero):
     # 没有开敌机
     if not hero.plane:
@@ -275,9 +315,12 @@ def handle_mouse(mouse_x, mouse_y, hero, enemies):
 def start_game(sett, screen, enemys, hero, bullets, stats, sb):
     """开始游戏"""
     if not stats.game_active:
+<<<<<<< HEAD
         #bgm
         pg.mixer.music.play(-1)
 
+=======
+>>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
         # 重置游戏统计信息
         stats.reset_stats()
         stats.game_active = True
@@ -293,6 +336,7 @@ def start_game(sett, screen, enemys, hero, bullets, stats, sb):
         sb.prep_level()
         sb.prep_planes()
 
+<<<<<<< HEAD
 def update_screen(sett, screen,bg, hero, enemies, bullets,bursts, play_button, pause_button, stats, sb,sound):
     """
 	更新屏幕
@@ -300,12 +344,22 @@ def update_screen(sett, screen,bg, hero, enemies, bullets,bursts, play_button, p
     sound.play_snd(sett)
     #sound.sound['fire'].play()
 
+=======
+def update_screen(sett, screen,bg, hero, enemies, bullets,bursts, play_button, pause_button, stats, sb):
+    """
+	更新屏幕
+	"""
+>>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
     #重绘屏幕背景颜色
     if stats.night:
         screen.fill(sett.bg_color)
     else:
         bg.drawme(screen)
     
+<<<<<<< HEAD
+=======
+
+>>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
     #重绘子弹
     for i in range(6):
         if bullets[i]:
@@ -318,6 +372,7 @@ def update_screen(sett, screen,bg, hero, enemies, bullets,bursts, play_button, p
 
     #重绘主角
     hero.drawme()
+<<<<<<< HEAD
     #重绘爆炸  
     bursts.draw(screen)
     #重绘积分牌
@@ -333,6 +388,26 @@ def update_screen(sett, screen,bg, hero, enemies, bullets,bursts, play_button, p
     
 
 def update_enemies(enemies, hero, bullets,bursts, stats, t_interval, sb,sound):
+=======
+
+    #重绘爆炸   
+    bursts.draw(screen)
+
+    #重绘积分牌
+    sb.show_score()
+
+    # 如果游戏处于非活动状态就绘制play按钮
+    if not stats.game_active:
+        play_button.draw_button()
+
+    #暂停按钮
+    if stats.game_pause:
+        pause_button.draw_button()
+
+    pg.display.flip()
+
+def update_enemies(enemies, hero, bullets,bursts, stats, t_interval, sb):
+>>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
     """
 	生成新enemy
 	更新enemy的位置或发射子弹，判断enemy是否与hero碰撞,若是，将碰撞的enemy存到hero.plane，
@@ -344,7 +419,10 @@ def update_enemies(enemies, hero, bullets,bursts, stats, t_interval, sb,sound):
     if not hero.plane:
         jacked_enemies = pg.sprite.spritecollide(hero, enemies, False)
         if jacked_enemies:
+<<<<<<< HEAD
             sound.do_play['hijacked']=True
+=======
+>>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
             hero.plane = jacked_enemies[0]
             enemies.remove(jacked_enemies[0])           
             hero.plane.image=hero.plane.images[1] if hero.face_right else hero.plane.images[0]  
@@ -363,7 +441,11 @@ def update_enemies(enemies, hero, bullets,bursts, stats, t_interval, sb,sound):
     else:
         enemies_crash = pg.sprite.spritecollide(hero.plane, enemies, False)
         if enemies_crash:
+<<<<<<< HEAD
             start_burst(True,hero,bursts,sound)
+=======
+            start_burst(True,hero,bursts)
+>>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
             hero.plane = None
             hero.face_right = True
             hero.shoot_dir = 0
@@ -371,12 +453,17 @@ def update_enemies(enemies, hero, bullets,bursts, stats, t_interval, sb,sound):
             hero.jumpfallspeed = 0
             hero.life -= 1
             for enemy_crash in enemies_crash:
+<<<<<<< HEAD
                 start_burst(True,enemy_crash,bursts,sound)
+=======
+                start_burst(True,enemy_crash,bursts)
+>>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
                 enemies.remove(enemy_crash)
 
 def update_bursts(bursts):
     bursts.update()
     for burst in bursts.copy():
+<<<<<<< HEAD
         if burst.time > 1600:
             bursts.remove(burst)
 
@@ -386,6 +473,17 @@ def start_burst(isenemy, obj, bursts,sound):
     sound.do_play['burst']=True
 
 def update_bullets(sett, bullets, hero, enemies, bursts, screen, stats, t_interval, sb,sound):
+=======
+        if burst.time>1600:
+            bursts.remove(burst)
+
+def start_burst(isenemy, obj, bursts):
+    burst = Burst(isenemy, (obj.rect.centerx, obj.rect.centery))
+    bursts.add(burst)
+
+
+def update_bullets(sett, bullets, hero, enemies, bursts, screen, stats, t_interval, sb):
+>>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
     """
 	更新子弹位置，判断子弹是否与hero或enemies碰撞,导弹与敌方炮弹是否碰撞
 	"""
@@ -397,6 +495,7 @@ def update_bullets(sett, bullets, hero, enemies, bursts, screen, stats, t_interv
             bullets[i].update(bullets, t_interval)
 
     # hero中弹
+<<<<<<< HEAD
     hero_get_shot(bullets, hero,bursts, sb,sound)
 
     # 敌机中弹，可能要更新最高分，当前分数，生成新的敌机
@@ -409,6 +508,20 @@ def update_bullets(sett, bullets, hero, enemies, bursts, screen, stats, t_interv
     enemy_missile_get_shot(bullets,bursts,sound)
 
 def hero_get_shot(bullets, hero,bursts, sb,sound):
+=======
+    hero_get_shot(bullets, hero,bursts, sb)
+
+    # 敌机中弹，可能要更新最高分，当前分数，生成新的敌机
+    enemy_get_shot(bullets, enemies,bursts, stats, sett, sb, screen)
+
+    # 己方导弹中弹：
+    hero_missile_get_shot(bullets,bursts)
+
+    # 对方导弹中弹
+    enemy_missile_get_shot(bullets,bursts)
+
+def hero_get_shot(bullets, hero,bursts, sb):
+>>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
     """
     :param bullets: 子弹列表，编组的列表
     :param hero: 英雄
@@ -419,12 +532,20 @@ def hero_get_shot(bullets, hero,bursts, sb,sound):
         bullet_hits = pg.sprite.spritecollide(me, bullets[i + 3], False)
         for bullet_hit in bullet_hits:
             if i==2:
+<<<<<<< HEAD
                 start_burst(False,bullet_hit,bursts,sound)
+=======
+                start_burst(False,bullet_hit,bursts)
+>>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
             me.life -= bullet_hit.lethality
             if me.life <= 0:
                 if str(type(me)) != "<class 'hero.Hero'>":
                     # 驾驶的敌机毁灭, 主角生命值减一
+<<<<<<< HEAD
                     start_burst(True,hero,bursts,sound)
+=======
+                    start_burst(True,hero,bursts)
+>>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
                     hero.life -= 1
                     hero.plane = None
                     hero.face_right = True
@@ -433,7 +554,11 @@ def hero_get_shot(bullets, hero,bursts, sb,sound):
                     hero.jumpfallspeed = 0
             bullets[i + 3].remove(bullet_hit)
 
+<<<<<<< HEAD
 def enemy_get_shot(bullets, enemies,bursts, stats, sett, sb, screen,sound):
+=======
+def enemy_get_shot(bullets, enemies,bursts, stats, sett, sb, screen):
+>>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
     """
     :param bullets: 子弹列表，编组的列表
     :param enemies: 敌机编组
@@ -446,12 +571,21 @@ def enemy_get_shot(bullets, enemies,bursts, stats, sett, sb, screen,sound):
         collisions0 = pg.sprite.groupcollide(bullets[i], enemies, True, False)
         if collisions0:
             for bullet_hit, enemy_hits in collisions0.items():
+<<<<<<< HEAD
                 if i==2:
                     start_burst(False,bullet_hit,bursts,sound)
                 enemy_hits[0].life -= bullet_hit.lethality
                 stats.score += bullet_hit.lethality
                 if enemy_hits[0].life <= 0:
                     start_burst(True,enemy_hits[0], bursts,sound)               
+=======
+                if i == 2:
+                    start_burst(False,bullet_hit, bursts)
+                enemy_hits[0].life -= bullet_hit.lethality
+                stats.score += bullet_hit.lethality
+                if enemy_hits[0].life <= 0:
+                    start_burst(True,enemy_hits[0], bursts)               
+>>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
                     enemies.remove(enemy_hits[0])
                     stats.score += sett.enemy_points
     #更新当前分数
@@ -468,7 +602,11 @@ def enemy_get_shot(bullets, enemies,bursts, stats, sett, sb, screen,sound):
     if len(enemies) <= 2:
         create_enemys(sett, screen, enemies)
 
+<<<<<<< HEAD
 def hero_missile_get_shot(bullets,bursts,sound):
+=======
+def hero_missile_get_shot(bullets,bursts):
+>>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
     """己方导弹中弹"""
     for i in range(3):
         collisions1 = pg.sprite.groupcollide(bullets[2], bullets[i + 3], False, False)
@@ -477,17 +615,29 @@ def hero_missile_get_shot(bullets,bursts,sound):
                 for enmbullet in enmbullets:
                     mymissile.life -= enmbullet.lethality
                     if mymissile.life <= 0:
+<<<<<<< HEAD
                         start_burst(False, mymissile, bursts,sound)
+=======
+                        start_burst(False, mymissile, bursts)
+>>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
                         bullets[2].remove(mymissile)
                     if i == 2:
                         enmbullet.life -= mymissile.lethality
                         if enmbullet.life <= 0:
+<<<<<<< HEAD
                             start_burst(False,enmbullet,bursts,sound)
+=======
+                            start_burst(False,enmbullet,bursts)
+>>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
                             bullets[5].remove(enmbullet)
                     else:
                         bullets[i + 3].remove(enmbullet)
 
+<<<<<<< HEAD
 def enemy_missile_get_shot(bullets, bursts,sound):
+=======
+def enemy_missile_get_shot(bullets, bursts):
+>>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
     """敌方导弹中弹"""
     for i in range(3):
         collisions2 = pg.sprite.groupcollide(bullets[5], bullets[i], False, False)
@@ -496,12 +646,20 @@ def enemy_missile_get_shot(bullets, bursts,sound):
                 for mybullet in mybullets:
                     enmmissile.life -= mybullet.lethality
                     if enmmissile.life <= 0:
+<<<<<<< HEAD
                         start_burst(False,enmmissile, bursts,sound)
+=======
+                        start_burst(False,enmmissile, bursts)
+>>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
                         bullets[5].remove(enmmissile)
                     if i == 2:
                         mybullet.life -= enmmissile.lethality
                         if mybullet.life <= 0:
+<<<<<<< HEAD
                             start_burst(False,mybullet,bursts,sound)
+=======
+                            start_burst(False,mybullet,bursts)
+>>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
                             bullets[2].remove(mybullet)
                     else:
                         bullets[i].remove(mybullet)

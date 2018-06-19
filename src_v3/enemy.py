@@ -68,7 +68,11 @@ class Enemy(Sprite):
         elif self.typex==1:
             self.track(300,100)
         elif self.typex==2:
+<<<<<<< HEAD
             self.track(150,200)
+=======
+            self.track(100,200)
+>>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
 
         #随机发射子弹，1/fire_T概率发射
         randnum = random.randint(1, self.fire_T)
@@ -118,8 +122,13 @@ class Ordin_plane(Enemy):
         self.speed = settings.ordinPlaneSpeed
         self.time_limit = settings.ordinPlaneTimeLimit  # hero可以驾驶的时限
         self.bullet_type = 0
+<<<<<<< HEAD
         self.t_turn=900
         self.t = float(random.randint(0,self.t_turn-100)) #控制其位置的自变量：self.y=a(t),self.x=b(t)
+=======
+        self.t_turn=950
+        self.t = float(random.randint(0,self.t_turn)) #控制其位置的自变量：self.y=a(t),self.x=b(t)
+>>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
         self.init_t=self.t
         Enemy.__init__(self, settings, screen, self.life, self.speed, self.time_limit, self.bullet_type)
 
@@ -132,7 +141,11 @@ class Multi_plane(Enemy):
         self.time_limit = settings.multiPlaneTimeLimit  # hero可以驾驶的时限
         self.bullet_type = 1
         self.t_turn=750
+<<<<<<< HEAD
         self.t = float(random.randint(0,self.t_turn-100)) #控制其位置的自变量：self.y=a(t),self.x=b(t)
+=======
+        self.t = float(random.randint(0,self.t_turn)) #控制其位置的自变量：self.y=a(t),self.x=b(t)
+>>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
         self.init_t=self.t
         Enemy.__init__(self, settings, screen, self.life, self.speed, self.time_limit, self.bullet_type)
 
@@ -144,7 +157,12 @@ class Missile_plane(Enemy):
         self.speed = settings.missilePlaneSpeed
         self.time_limit = settings.missilePlaneTimeLimit  # hero可以驾驶的时限
         self.bullet_type = 2
+<<<<<<< HEAD
         self.t_turn=900
         self.t = float(random.randint(0,self.t_turn-200)) #控制其位置的自变量：self.y=a(t),self.x=b(t)
+=======
+        self.t_turn=1050
+        self.t = float(random.randint(0,self.t_turn)) #控制其位置的自变量：self.y=a(t),self.x=b(t)
+>>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
         self.init_t=self.t
         Enemy.__init__(self, settings, screen, self.life, self.speed, self.time_limit, self.bullet_type)  

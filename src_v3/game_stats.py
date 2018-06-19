@@ -8,8 +8,13 @@ class GameStats():
         self.g_settings = g_settings
         self.game_active = False
         self.game_pause = False
+<<<<<<< HEAD
         self.time_=0
         self.night=False #是否为黑夜模式
+=======
+        self.time_ = 0
+        self.night = False #是否为黑夜模式
+>>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
         self.reset_stats()
         self.high_score = 0
 

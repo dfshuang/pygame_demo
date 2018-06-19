@@ -54,7 +54,11 @@ class Settings():
         self.acc = 2700  # 重力加速度
         self.groundy = self.screen_height  # 地面的y坐标
         self.enemy_points = 100 #积分
+<<<<<<< HEAD
         self.background=0   #背景选择
         self.quiet=False    #静音
+=======
+    
+>>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
 
        

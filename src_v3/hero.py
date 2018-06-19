@@ -150,7 +150,11 @@ class Hero(Sprite):
                             index=int(11-self.shoot_dir//(math.pi/4))
                         else:
                             index=int(3-self.shoot_dir//(math.pi/4))
+<<<<<<< HEAD
                         #报错
+=======
+                        #print(index,self.imgnum)
+>>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
                         self.image=self.images['run'][index][self.imgnum]
                         tmprect=self.rect                    
                         self.rect=self.image.get_rect()
@@ -190,7 +194,11 @@ class Hero(Sprite):
             planeTimeLeft = self.plane.jackedTime + self.plane.time_limit - time.clock()
             if planeTimeLeft <= 0:
                 # 超时
+<<<<<<< HEAD
                 gf.start_burst(True,self,bursts,sound)
+=======
+                gf.start_burst(True,self,bursts)
+>>>>>>> 384da0097d8ae9040c39a62fa19ee5f5619ac425
                 self.plane = None
                 self.life -= 1
                 self.face_right = True
