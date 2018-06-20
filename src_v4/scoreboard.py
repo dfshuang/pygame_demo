@@ -19,16 +19,19 @@ class Scoreboard():
         self.prep_score()
         self.prep_high_score()
         self.prep_level()
-        self.prep_planes()
+        #self.prep_planes()
         self.prep_herolife()
         self.prep_planeLife()
         self.prep_planeTimeLimit()
         self.prep_helpMessage()
         self.prep_boss_life()
+        self.prep_gameover()
+        self.prep_skill()
+        self.prep_goodjob()
 
     def prep_boss_life(self):
         """显示boss血量"""
-        boss_life_str = 'boss life: ' + '{:}'.format(int(self.stats.bossLife))
+        boss_life_str = 'boss life: ' + '{:}'.format(int(self.stats.bossLife if self.stats.bossLife>0 else 0))
         self.boss_life_image = self.font.render(boss_life_str, True, self.text_color)
         # 将生命值放在屏幕左上角
         self.boss_life_rect = self.boss_life_image.get_rect()
@@ -63,18 +66,18 @@ class Scoreboard():
         self.level_rect.right = self.score_rect.right
         self.level_rect.top = self.score_rect.bottom + 10
 
-    def prep_planes(self):
-        """显示余下多少艘飞船"""
-        self.planes = Group()
-        for plane_number in range(self.stats.hero_left):
-            plane = Hero(self.screen, self.g_settings)
-            plane.rect.x = 10 + plane_number * plane.rect.width
-            plane.rect.y = 10
-            self.planes.add(plane)
+    # def prep_planes(self):
+    #     """显示余下多少艘飞船"""
+    #     self.planes = Group()
+    #     for plane_number in range(self.stats.hero_left):
+    #         plane = Hero(self.screen, self.g_settings)
+    #         plane.rect.x = 10 + plane_number * plane.rect.width
+    #         plane.rect.y = 10
+    #         self.planes.add(plane)
 
     def prep_herolife(self):
         """将主角生命值转换为一幅渲染的图像"""
-        plane = Hero(self.screen, self.g_settings)  #为获取plane图像高度
+        plane = Hero(self.screen, self.g_settings, self.stats)  #为获取plane图像高度
         hero_life_str = 'life: ' + '{:,}'.format(self.stats.heroLife)
         self.hero_life_image = self.font.render(hero_life_str, True, self.text_color)
         # 将生命值放在屏幕左上角
@@ -100,7 +103,7 @@ class Scoreboard():
 
     def prep_helpMessage(self):
         fonttemp = pygame.font.SysFont(None, 30)
-        helpMessage_str = 'q: exit, ad jk io u'
+        helpMessage_str = ''
         self.helpMessage_image = fonttemp.render(helpMessage_str, True, self.text_color)
 
         # 将生命值放在屏幕左上角
@@ -137,6 +140,43 @@ class Scoreboard():
                 if record_cnt > 10:
                     break
 
+    def prep_gameover(self):
+        fonttemp = pygame.font.SysFont(None, 60)
+        gameover_str = 'Game  Over !'
+        self.gameover_image = fonttemp.render(gameover_str, True, (255,0,0))
+
+        self.gameover_rect = self.gameover_image.get_rect()
+        self.gameover_rect.centerx = self.screen_rect.centerx
+        self.gameover_rect.centery = 300
+
+    def prep_goodjob(self):
+        fonttemp = pygame.font.SysFont(None, 60)
+        goodjob_str = 'Good Job !!!'
+        self.goodjob_image = fonttemp.render(goodjob_str, True, (0,255,0))
+
+        self.goodjob_rect = self.goodjob_image.get_rect()
+        self.goodjob_rect.centerx = self.screen_rect.centerx
+        self.goodjob_rect.centery = 250
+
+    def prep_skill(self):
+        #加载技能图标
+        hero_skill_image = pygame.image.load('../image/hero/skill_circle.png')
+        # 将生命值放在屏幕左上角
+        hero_skill_image_rect = hero_skill_image.get_rect()
+        hero_skill_image_rect.left = 20
+        hero_skill_image_rect.top = 10
+
+        #渲染技能冷却时间
+        skill_time_str = ' : ' + '{:3.2f}'.format(self.stats.hero_skill_cooling_time/1000)
+        skill_time_image = self.font.render(skill_time_str, True, self.text_color)
+        # 将生命值放在屏幕左上角
+        skill_time_rect = skill_time_image.get_rect()
+        skill_time_rect.left = 70
+        skill_time_rect.top = 25
+
+        self.screen.blit(hero_skill_image, hero_skill_image_rect)
+        self.screen.blit(skill_time_image, skill_time_rect)
+
     def show_message(self):
         """在屏幕上显示得分"""
         #更新屏幕消息
@@ -149,9 +189,9 @@ class Scoreboard():
         if self.stats.preMessage['le'] != self.stats.level:
             self.prep_level()
             self.stats.preMessage['le'] = self.stats.level
-        if self.stats.preMessage['hl'] != self.stats.hero_left:
-            self.prep_planes()
-            self.stats.preMessage['hl'] = self.stats.hero_left
+        # if self.stats.preMessage['hl'] != self.stats.hero_left:
+        #     self.prep_planes()
+        #     self.stats.preMessage['hl'] = self.stats.hero_left
         if self.stats.preMessage['hlife'] != self.stats.heroLife:
             self.prep_herolife()
             self.stats.preMessage['hlife'] = self.stats.heroLife
@@ -161,7 +201,7 @@ class Scoreboard():
         if self.stats.preMessage['ptime'] != self.stats.planeTimeLimit:
             self.prep_planeTimeLimit()
             self.stats.preMessage['ptime'] = self.stats.planeTimeLimit
-        if self.stats.boss.appeared and self.stats.preMessage['bosslife'] != self.stats.bossLife:
+        if self.stats.game_windows['boss_appear'] and self.stats.preMessage['bosslife'] != self.stats.bossLife:
             self.prep_boss_life()
             self.stats.preMessage['bosslife'] = self.stats.bossLife
 
@@ -172,13 +212,18 @@ class Scoreboard():
         self.screen.blit(self.hero_life_image, self.hero_life_rect)
         self.screen.blit(self.planeTimeLimit_image, self.planeTimeLimit_rect)
         self.screen.blit(self.planeLife_image, self.planeLife_rect)
-        if self.stats.boss.appeared:
+        if self.stats.game_windows['boss_appear']:
             self.screen.blit(self.boss_life_image, self.boss_life_rect)
-        if self.stats.game_pause or self.stats.isHelp:
+        if self.stats.game_windows['help']:
             self.screen.blit(self.helpMessage_image, self.helpMessage_rect)
-        if self.stats.isRecord:
+        if self.stats.game_windows['record']:
             self.prep_record()
+        if self.stats.game_windows['game_over']:
+            self.screen.blit(self.gameover_image, self.gameover_rect)
+        if self.stats.game_windows['continue'] and not self.stats.game_windows['game_pause']:
+            self.screen.blit(self.goodjob_image, self.goodjob_rect)
         #绘制飞机多少条命
-        self.planes.draw(self.screen)
+        #self.planes.draw(self.screen)
 
+        self.prep_skill()
 

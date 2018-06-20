@@ -39,7 +39,7 @@ class Settings():
         self.missilePlaneSpeed = 100
         self.bossSpeed = 80
         
-        self.fire_T = [7, 20, 40] #发射子弹间隔时间
+        self.fire_T = [10, 20, 30,120] #发射子弹间隔时间
 
         self.ordinPlaneTimeLimit = 60
         self.multiPlaneTimeLimit = 45
@@ -47,11 +47,11 @@ class Settings():
 
 
         # hero设置
-        self.hero_limit = 3
-        self.hero_life = 25 #hero每条命的血量
+        self.hero_limit = 0
+        self.hero_life = 50 #hero每条命的血量
         self.hero_speed = 300
         self.jump_init_speed = -1100  # 向上为负方向
-
+        self.hero_skill_cooling_time = 4000
 
         # other settings
         self.acc = 2700  # 重力加速度

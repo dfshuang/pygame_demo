@@ -66,7 +66,7 @@ class Enemy(Sprite):
 
     def update(self, bullets, target_hero, t_interval,sound):
         """移动或发射子弹"""
-        #移动, 修改x, y后写入rect中
+        #移动, 修改x, y后写入rect中，bullet_type 为3时为boss
         if self.bullet_type!=3:
             t_change = t_interval * self.speed
             self.t+=t_change
@@ -81,12 +81,13 @@ class Enemy(Sprite):
             #随机发射子弹，1/fire_T概率发射
             randnum = random.randint(1, self.fire_T)
             if randnum == 3:
-                self.fire_bullet(bullets, self.screen, target_hero,sound)
+                self.fire_bullet(bullets, self.screen, target_hero, sound, t_interval)
 
+        #boss
         else:
             if not self.appeared:
-                if time.clock()>60:
-                    self.appeared=True
+                if time.clock() > self.appearTime:
+                    self.appeared = True
             else:
                 t_change = t_interval * self.speed
                 self._t+=t_change
@@ -99,37 +100,38 @@ class Enemy(Sprite):
                         if randnum==10 or randnum==11:
                             self.shooting=0
                             self.clock0=pygame.time.Clock()
-                            #self.fire_bullet(bullets,0)
                         elif randnum==30 or randnum==31 or randnum==32:
                             self.shooting=1
                             self.clock0=pygame.time.Clock()
-                            #self.fire_bullet(bullets,1)
                         elif randnum==50:
                             self.shooting=2
                             self.clock0=pygame.time.Clock()
-                            #self.fire_bullet(bullets,2,target_hero)
             
-                self.fire_bullet(bullets, self.screen , self.shooting, target_hero)
+                self.fire_bullet(bullets, self.screen, self.shooting, target_hero)
             
 
-    def fire_bullet(self, bullets, screen, target_hero,sound):
+    def fire_bullet(self, bullets, screen, target_hero,sound, t_interval):
         """
         发射子弹，根据传入的子弹类型发射对应子弹
         """
-        direction = random.randint(0, 7) - 3
-        if self.typex == 0:
-            bulletx = bullet.Bullet0(self.settings, screen, self, math.pi * direction/4, False)
-            bullets[3].add(bulletx)
-        elif self.typex == 1:
-            bulletx = bullet.Bullet1(self.settings, screen, self, math.pi * direction/4, False)
-            bullets[4].add(bulletx)
-        elif self.typex == 2:
-            bulletx = bullet.Bullet2(self.settings, screen, self, target_hero, False)
-            bullets[5].add(bulletx)
-            sound.do_play['missile']=True
+        #每t_interval发射一次，概率
+        if random.randint(0, int(1/t_interval)) == 1:
+
+            #方向随机，根据子弹类型发射相应的子弹
+            direction = random.randint(0, 7) - 3
+            if self.typex == 0:
+                bulletx = bullet.Bullet0(self.settings, screen, self, math.pi * direction/4, False)
+                bullets[3].add(bulletx)
+            elif self.typex == 1:
+                bulletx = bullet.Bullet1(self.settings, screen, self, math.pi * direction/4, False)
+                bullets[4].add(bulletx)
+            elif self.typex == 2:
+                bulletx = bullet.Bullet2(self.settings, screen, self, target_hero, False)
+                bullets[5].add(bulletx)
+                sound.do_play['missile']=True
 
     def track(self,Rx,Ry,t_change=0):
-        '''移动在轨迹上，Rx为x轴方向的半径，Ry为y方向半径'''
+        """移动在轨迹上，Rx为x轴方向的半径，Ry为y方向半径"""
         if self.bullet_type==3:
             if self._t<300:
                 self.t+=t_change
@@ -194,6 +196,7 @@ class Missile_plane(Enemy):
 class Boss(Enemy):
     def __init__(self,settings,screen):
         self.appeared=False
+        self.appearTime=300
         self.life = settings.bossLife  # 生命值
         self.speed = settings.bossSpeed
         self.bullet_type = 3
@@ -204,12 +207,13 @@ class Boss(Enemy):
         #self.rect.centerx+=57
         self.rect.centery=0.5 * settings.screen_height
         self.y=float(self.rect.centery)
-        self.inity=self.y
+        self.inity = self.y
 
         self.t_turn=500
         self._t=0 #控制其位置的自变量：self.y=a(t),self.x=b(t)
         self.t = 0 
         self.init_t=self._t
+
 
         self.time0=0.0
         self.clock0=0

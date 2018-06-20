@@ -3,13 +3,14 @@ import pygame
 class GameStats():
     """跟踪显示游戏的统计信息"""
 
-    def __init__(self, g_settings):
+    def __init__(self, g_settings, boss):
         """初始化统计信息"""
         self.g_settings = g_settings
         self.time_ = 0
         self.night = False #是否为黑夜模式
         self.reset_stats()  #游戏开始，重置信息
         self.high_score = 0
+        self.boss = boss
 
         #控制游戏处于哪个页面
         self.game_active = False
@@ -25,6 +26,8 @@ class GameStats():
         #游戏是否处于静音状态
         self.isQuiet = False
 
+        self.preMessage = {'hl':0, 'sc':0, 'le':0, 'hlife':0, 'plife':0, 'ptime':0, 'hc':0, 'bosslife':self.g_settings.bossLife}
+
     def reset_stats(self):
         """初始化在游戏运行期间可能变化的统计信息"""
         self.hero_left = self.g_settings.hero_limit  #命的条数
@@ -33,3 +36,4 @@ class GameStats():
         self.heroLife = 0
         self.planeLife = 0
         self.planeTimeLimit = 0
+        self.bossLife = self.g_settings.bossLife

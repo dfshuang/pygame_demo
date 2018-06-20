@@ -152,8 +152,8 @@ class Hero(Sprite):
                         if self.shoot_dir>0:
                             index=int(11-self.shoot_dir//(math.pi/4))
                         else:
-                            index=int(3-self.shoot_dir//(math.pi/4))
-                        #报错
+                            index = int(3-self.shoot_dir//(math.pi/4))
+
                         self.image=self.images['run'][index][self.imgnum]
                         tmprect=self.rect                    
                         self.rect=self.image.get_rect()
@@ -193,7 +193,7 @@ class Hero(Sprite):
             planeTimeLeft = self.plane.jackedTime + self.plane.time_limit - time.clock()
             if planeTimeLeft <= 0:
                 # 超时
-                gf.start_burst(True,self,bursts,sound)
+                gf.start_burst(True, self, bursts, sound)
                 self.plane = None
                 self.life -= 1
                 self.face_right = True
@@ -237,6 +237,7 @@ class Hero(Sprite):
         if self.life <= 0:
             sound.do_play['die'] = True
             stats.hero_left -= 1
+            sb.pHeros = True
             if stats.hero_left <= 0:
                 stats.game_active = False
                 stats.isStartMenu = True

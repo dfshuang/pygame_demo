@@ -26,16 +26,17 @@ def run_game():
     pg.display.set_caption("Super Hijacker")
 
     menu = Menu(screen)
-    boss = Boss(sett, screen)
-    stats = GameStats(sett, boss)
+
+    stats = GameStats(sett)
+    boss = Boss(sett, screen, stats)
     sb = Scoreboard(sett, screen, stats)
 
     #背景
-    bg = Background(sett)
+    bg = Background(sett, stats)
     sound = Sound()
 
     # 创建hero
-    hero = Hero(screen, sett)
+    hero = Hero(screen, sett, stats)
 
     # 创建存储敌机的编组
     enemies = Group()
@@ -58,15 +59,15 @@ def run_game():
     # 游戏主循环
     while True:
         t_interval = clock.tick()/1000  #距离上一帧的时间间隔(s)
-        gf.night_or_day(t_interval, stats, sett)
         gf.handle_events(sett, screen, hero, enemies, boss, bullets, bursts, stats, sb, sound, menu)
-        if stats.game_active is True and not stats.game_pause:
-            bg.update()
+        if stats.game_windows['game_active'] and not stats.game_windows['game_pause'] \
+                and not stats.game_windows['continue']:
+            gf.night_or_day(t_interval, stats, sett)
+            bg.update(t_interval)
             hero.update(bullets, bursts, t_interval, stats, sb, sett,screen, sound)
             gf.update_bullets(sett, bullets, hero, enemies, boss,bursts, screen, stats, t_interval, sb, sound)
             boss.update(bullets, hero, t_interval, sound)
             gf.update_enemies(enemies,boss, hero, bullets, bursts, stats, t_interval, sb, sound)
-            gf.update_bursts(bursts)
+            gf.update_bursts(bursts, t_interval)
         gf.update_screen(sett, screen, bg, hero, enemies, boss, bullets, bursts, menu, stats, sb, sound)
-
 run_game()

@@ -24,7 +24,7 @@ def handle_events(sett, screen, hero, enemies, boss, bullets, bursts, stats, sb,
 
         elif event.type == pg.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = pg.mouse.get_pos()
-            handle_mouse(mouse_x, mouse_y, menu, stats, enemies, boss, bullets)
+            handle_mouse(sett, mouse_x, mouse_y, menu, stats, enemies, boss, bullets)
 
 
 def handle_keydown(sett, screen, event, enemies, boss, hero, bullets, bursts, stats, sb, sound):
@@ -47,14 +47,14 @@ def handle_keydown(sett, screen, event, enemies, boss, hero, bullets, bursts, st
 
     # 暂停游戏
     elif event.key == pg.K_p:
-        stats.game_pause = not stats.game_pause
+        stats.game_windows['game_pause'] = not stats.game_windows['game_pause']
 
     # 开始游戏
     elif event.key == pg.K_RETURN:
-        if stats.isStartMenu:
-            stats.start_game = True
-            stats.isStartMenu = False
-            game_play(stats, enemies, boss, bullets)
+        if stats.game_windows['start_menu']:
+            stats.game_windows['start_game'] = True
+            stats.game_windows['start_menu'] = False
+            game_play(stats, sett, enemies, boss, bullets)
 
     # 没有开敌机
     elif not hero.plane:
@@ -77,7 +77,7 @@ def handle_keydown(sett, screen, event, enemies, boss, hero, bullets, bursts, st
                 hero.face_right = False
                 degreepi = math.pi if hero.shoot_dir >= 0 else -math.pi
                 hero.shoot_dir = degreepi - hero.shoot_dir
-        elif event.key == pg.K_j:
+        elif event.key == pg.K_k:
             if not hero.jumporfall:
                 hero.jumporfall = True
                 hero.jumpfallspeed = hero.jump_init_speed
@@ -142,7 +142,7 @@ def handle_keydown(sett, screen, event, enemies, boss, hero, bullets, bursts, st
                         hero.rect.centerx, hero.rect.centery = tmprect.centerx, tmprect.centery
 
         # 开火
-        elif event.key == pg.K_k:
+        elif event.key == pg.K_j:
             bullet0 = Bullet0(sett, screen, hero, hero.shoot_dir, True, hero.lethality)
             bullets[0].add(bullet0)
             sound.do_play['fire'] = True
@@ -153,7 +153,6 @@ def handle_keydown(sett, screen, event, enemies, boss, hero, bullets, bursts, st
                 sound.do_play['skill'] = True
                 hero.cool_finished = False
                 hero.skilling = True
-                hero.skill_clock = pg.time.Clock()
 
     # 开敌机
     else:
@@ -200,7 +199,7 @@ def handle_keydown(sett, screen, event, enemies, boss, hero, bullets, bursts, st
                     if hero.shoot_dir > math.pi:
                         hero.shoot_dir = -math.pi + sett.dir_factor
 
-        elif event.key == pg.K_k:
+        elif event.key == pg.K_j:
             # 开火,不同战机不同子弹
             if str(type(hero.plane)) == "<class 'enemy.Ordin_plane'>":
                 # 三连发
@@ -219,7 +218,7 @@ def handle_keydown(sett, screen, event, enemies, boss, hero, bullets, bursts, st
                 bullets[2].add(bullet2)
                 sound.do_play['missile'] = True
 
-        elif event.key == pg.K_j:
+        elif event.key == pg.K_k:
             # 以跳跃方式离开敌机
             start_burst(True, hero, bursts, sound)
             hero.plane = None
@@ -227,7 +226,7 @@ def handle_keydown(sett, screen, event, enemies, boss, hero, bullets, bursts, st
             hero.shoot_dir = 0
             hero.jumporfall = True
             hero.jumpfallspeed = hero.jump_init_speed
-        elif event.key == pg.K_n:
+        elif event.key == pg.K_l:
             # 以下落方式离开敌机
             start_burst(True, hero, bursts, sound)
             hero.plane = None
@@ -240,7 +239,6 @@ def handle_keydown(sett, screen, event, enemies, boss, hero, bullets, bursts, st
                 sound.do_play['skill'] = True
                 hero.cool_finished = False
                 hero.skilling = True
-                hero.skill_clock = pg.time.Clock()
 
 
 def handle_keyup(event, hero):
@@ -272,24 +270,30 @@ def handle_keyup(event, hero):
             hero.plane.moving_udlr[1] = False
 
 
-def handle_mouse(mouse_x, mouse_y, menu, stats, enemies, boss, bullets):
+def handle_mouse(sett, mouse_x, mouse_y, menu, stats, enemies, boss, bullets):
     """处理鼠标事件，刚开始的开始菜单"""
     menu.collide_mouse(mouse_x, mouse_y, stats)
 
-    game_play(stats, enemies, boss, bullets)
+    game_play(stats, sett, enemies, boss, bullets)
 
     # 设置是否播放音乐
-    if stats.isQuiet:
+    if stats.game_windows['quiet']:
         pg.mixer.music.set_volume(0)
     else:
         pg.mixer.music.set_volume(1)
 
 
-def game_play(stats, enemies, boss, bullets):
+def game_play(stats, sett, enemies, boss, bullets):
     """开始游戏"""
     # 点击开始游戏
-    if stats.start_game:
-        boss.appearTime = time.clock() + 10
+    if stats.game_windows['start_game']:
+        stats.time_ = 0
+        boss.appeared = False
+        boss.time0 = 0.0
+        boss.rect.left, boss.rect.centery = sett.screen_width, 0.5 * sett.screen_height
+        boss._t = 0
+        boss.t = 0
+        boss.life = sett.bossLife
         # 重置游戏统计信息
         stats.reset_stats()
 
@@ -298,8 +302,8 @@ def game_play(stats, enemies, boss, bullets):
         for bulletsx in bullets:
             bulletsx.empty()
 
-        stats.game_active = True
-        stats.start_game = False
+        stats.game_windows['game_active'] = True
+        stats.game_windows['start_game'] = False
 
 
 def update_screen(sett, screen, bg, hero, enemies, boss, bullets, bursts, menu, stats, sb, sound):
@@ -307,7 +311,7 @@ def update_screen(sett, screen, bg, hero, enemies, boss, bullets, bursts, menu, 
     sound.play_snd(stats)
     # 重绘屏幕背景颜色
     if stats.night:
-        screen.fill(sett.bg_color)
+        screen.fill((0, 0, 0))
     else:
         bg.drawme(screen)
 
@@ -333,13 +337,14 @@ def update_screen(sett, screen, bg, hero, enemies, boss, bullets, bursts, menu, 
     # 重绘游戏显示信息
     sb.show_message()
 
-    #是否显示鼠标,游戏暂停或未进入游戏
-    if not stats.game_active or stats.game_pause:
+    # 是否显示鼠标,游戏暂停或未进入游戏
+    if not stats.game_windows['game_active'] or stats.game_windows['game_pause'] or \
+            stats.game_windows['game_over'] or stats.game_windows['continue']:
         pg.mouse.set_visible(True)
     else:
         pg.mouse.set_visible(False)
 
-    #重绘控件
+    # 重绘控件
     menu.draw(stats)
 
     pg.display.flip()
@@ -370,13 +375,8 @@ def update_enemies(enemies, boss, hero, bullets, bursts, stats, t_interval, sb, 
             hero.jumporfall = False
 
             # 开始倒计时
-            hero.plane.jackedTime = time.clock()
-            stats.planeTimeLimit = hero.plane.jackedTime
-        if boss.appeared:
-            boss_t=[boss]
-            bosses = pg.sprite.spritecollide(hero, boss_t, False) 
-            if bosses:
-                hero.life-=3
+            hero.plane.jackedTime = 0
+            stats.planeTimeLimit = hero.plane.time_limit
 
     else:
         enemies_crash = pg.sprite.spritecollide(hero.plane, enemies, False)
@@ -403,8 +403,9 @@ def update_enemies(enemies, boss, hero, bullets, bursts, stats, t_interval, sb, 
                 hero.jumpfallspeed = 0
                 hero.life -= 3
 
-def update_bursts(bursts):
-    bursts.update()
+
+def update_bursts(bursts, t_interval):
+    bursts.update(t_interval)
     for burst in bursts.copy():
         if burst.time > 1600:
             bursts.remove(burst)
@@ -486,16 +487,29 @@ def enemy_get_shot(hero, bullets, enemies, boss, bursts, stats, sett, sb, screen
                 boss.life -= bullet_hit.lethality
                 stats.bossLife = boss.life
                 if boss.life <= 0:
+                    #重置boss属性
+                    stats.time_ = 0
                     boss.appeared = False
-                    boss.rect.left, boss.rect.centery = 1200, 300
+                    boss.time0 = 0.0
+                    boss.rect.left, boss.rect.centery = sett.screen_width, 0.5 * sett.screen_height
                     boss._t = 0
                     boss.t = 0
                     boss.life = sett.bossLife
-                    boss.appearTime = time.clock()+3600
+
+                    #continue
                     boss_burst(boss, bursts, sound)
                     stats.score += sett.enemy_points * 10
-                    stats.game_active = False
-                    stats.isStartMenu = True
+                    stats.game_windows['continue'] = True
+
+                    # 增加下一关难度，发射子弹频率
+                    for i in range(4):
+                        sett.fire_T[i] -= 2 * (i + 1)
+                        if sett.fire_T[i] < 5:
+                            sett.fire_T[i] = 5
+                    boss.fire_T = sett.fire_T[3]
+
+
+
                 bullets[i].remove(bullet_hit)
 
     for i in range(3):
@@ -513,7 +527,7 @@ def enemy_get_shot(hero, bullets, enemies, boss, bursts, stats, sett, sb, screen
                     stats.score += sett.enemy_points
 
     # 更新当前分数
-    if stats.score >= stats.level ** 2 *2 * sett.enemy_points:
+    if stats.score >= stats.level ** 2 * 2 * sett.enemy_points:
         stats.level += 1
         sound.do_play['upgrade'] = True
 
@@ -607,12 +621,10 @@ def night_or_day(t_interval, stats, sett):
     """当stats.time_ 每次加一定的时间（t_interval）,达到一定的数值后进入黑夜"""
 
     stats.time_ += t_interval
-    #到黑夜的时间
+    if stats.time_ > 20:
+        stats.time_ = 0
+    # 到黑夜的时间
     if not stats.night and stats.time_ >= 10:
         stats.night = True
-        sett.bg_color = (0, 0, 0)
-        stats.time_ = 0
-    elif stats.night and stats.time_ >= 30:
+    elif stats.night and stats.time_ < 10:
         stats.night = False
-        sett.bg_color = (0, 255, 255)
-        stats.time_ = 0
