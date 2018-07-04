@@ -1,7 +1,7 @@
 import pygame
 
 
-class GameStats():
+class GameStats:
     """跟踪显示游戏的统计信息"""
 
     def __init__(self, g_settings):
@@ -20,14 +20,18 @@ class GameStats():
             'start_menu': True,
             'record': False,
             'setting': False,
+            'setting_bg': False,
             'help': False,
             'quiet': False,  # 游戏是否静音
             'continue': False,  # boss死后继续游戏
             'game_over': False,
-            'boss_appear': False
+            'boss_appear': False,
+            'good_job': False,
+            'show_danger': False,  #boss出现前5秒显示danger
+            'scene': 'bluesky'  #表示游戏的背景，有bluesky 和 dusk 两种
         }
 
-        self.preMessage = {'hl': 0, 'sc': 0, 'le': 0, 'hlife': 0, 'plife': 0, 'ptime': 0, 'hc': 0,
+        self.preMessage = {'hl': 0, 'sc': 0, 'le': 0, 'hlife': 0, 'plife': 0, 'ptime': 0,
                            'bosslife': self.g_settings.bossLife}
         self.hero_skill_cooling_time = 0
 

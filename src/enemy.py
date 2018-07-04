@@ -92,10 +92,13 @@ class Enemy(Sprite):
         else:
             if not self.appeared:
                 self.time0 += t_interval
-                if self.time0 > 10:
+                if self.time0 > self.settings.boss_appear_interval:
                     self.time0 = 0.0
                     self.appeared = True
                     self.stats.game_windows['boss_appear'] = True
+                    self.stats.game_windows['show_danger'] = False
+                elif self.time0 > self.settings.boss_appear_interval - 5:
+                    self.stats.game_windows['show_danger'] = True
 
             else:
                 t_change = t_interval * self.speed
@@ -210,9 +213,6 @@ class Boss(Enemy):
         self.bullet_type = 3
 
         Enemy.__init__(self, settings, screen, self.life, self.speed, 0, self.bullet_type)
-        # self.rect_draw=pygame.Rect(self.rect)
-        # self.rect.width=89
-        # self.rect.centerx+=57
         self.rect.centery = 0.5 * settings.screen_height
         self.y = float(self.rect.centery)
         self.inity = self.y
@@ -222,7 +222,7 @@ class Boss(Enemy):
         self.t = 0
         self.init_t = self._t
 
-        self.time0 = 0.0
+        self.time0 = 0.0   #当到达boos出现间隔时间时，boss出现并置为0
         self.shoot_dir0 = 0
         self.shooting = -1
 
@@ -240,8 +240,7 @@ class Boss(Enemy):
                     bulletx = bullet.Bullet0(self.settings, screen, self, self.shoot_dir0 + i * (math.pi / 20), False,
                                              1)
                     bullets[3].add(bulletx)
-            if not self.stats.game_windows['game_pause']:
-                self.time0 += t_interval * 1000
+            self.time0 += t_interval * 1000
 
         elif typex == 1:
             tmp = self.shoot_dir0
@@ -256,8 +255,7 @@ class Boss(Enemy):
                     bulletx = bullet.Bullet1(self.settings, screen, self, i * (math.pi / 2), False, self.shoot_dir0,
                                              True)
                     bullets[4].add(bulletx)
-            if not self.stats.game_windows['game_pause']:
-                self.time0 += t_interval * 1000
+            self.time0 += t_interval * 1000
 
         elif typex == 2:
             tmp = self.shoot_dir0
@@ -270,5 +268,4 @@ class Boss(Enemy):
                     return
                 bulletx = bullet.Bullet2(self.settings, screen, self, target_hero, False)
                 bullets[5].add(bulletx)
-            if not self.stats.game_windows['game_pause']:
-                self.time0 += t_interval * 1000
+            self.time0 += t_interval * 1000

@@ -9,7 +9,11 @@ from pygame.sprite import Sprite
 
 
 class Background():
-    def __init__(self, sett):
+    def __init__(self, sett, stats):
+
+        self.stats = stats
+        self.sett=sett
+        self.type='bluesky'
         self.skys = []
         self.lands = []
         for i in range(2):
@@ -18,21 +22,22 @@ class Background():
         self.fullimage = self.skys[0]
         self.images = [0, 0]
         self.rects = [0, 0]
-        self.images[0] = self.fullimage.subsurface(pg.Rect((0, 0), (1200, 800)))
+        self.images[0] = self.fullimage.subsurface(pg.Rect((0, 0), (1000, 600)))
         self.images[1] = self.lands[0]
         for i in range(2):
             self.rects[i] = self.images[i].get_rect()
         self.rects[1].bottom = sett.screen_height
         self.time = 0.0
-        self.clock = pg.time.Clock()
-        self.T = (4033 - 1200) * 30.0
+        self.fullrect=self.fullimage.get_rect()
+        self.T = (self.fullrect.width - 1000) * sett.bgmoveT
 
-    def update(self):
-        self.time += self.clock.tick()
+    def update(self, t_interval):
+        if not self.stats.game_windows['game_pause']:
+            self.time += t_interval * 1000
         if self.time > self.T:
             self.time = 0
-        i = int(self.time // 30)
-        self.images[0] = self.fullimage.subsurface(pg.Rect((i, 0), (1200, 800)))
+        i = int(self.time // self.sett.bgmoveT)
+        self.images[0] = self.fullimage.subsurface(pg.Rect((i, 0), (1000, 600)))
 
     def drawme(self, screen):
         for i in range(2):
@@ -57,7 +62,7 @@ class Sound():
         self.sound['die'] = pg.mixer.Sound('../sound/die.wav')
 
     def play_snd(self, stats):
-        if not stats.isQuiet:
+        if not stats.game_windows['quiet']:
             for action, val in self.do_play.items():
                 if val:
                     self.sound[action].play()
