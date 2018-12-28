@@ -1,7 +1,4 @@
----
-typora-copy-images-to: readme_image
-typora-root-url: readme_image
----
+
 
 # pygame_demo
 
@@ -40,8 +37,8 @@ n降落，j跳离，w,s上下
 
 运行截图：
 
-![1545993408387](/1545993408387.png)
+![1545993408387](readme_image/1545993408387.png)
 
 
 
-![1545993429197](/1545993429197.png)
+![1545993429197](readme_image/1545993429197.png)
